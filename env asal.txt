@@ -1,0 +1,22 @@
+
+Migrate database from Ubuntu server to localserver (10.159.120.108)
+ /* - migrate on 26/03/2024
+
+### Ubuntu Server DB ###
+
+DB_CONNECTION=mysql
+DB_HOST=10.159.120.106
+DB_PORT=3306
+DB_DATABASE=db_edirektori
+DB_USERNAME=jknserver
+DB_PASSWORD=ictjkn123
+
+
+### Local Server DB ###
+
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=db_edirektori
+DB_USERNAME=root
+DB_PASSWORD=ictjkn123
