@@ -190,31 +190,58 @@ class PegawaiController extends Controller
 
     }
 
-     public function update()
-    {
-        $pegawai = new pegawai();
+    public function update(Request $request)
+{
+    $id = $request->input('id');
+    $pegawai = Pegawai::findOrFail($id);
 
-        $id = request('id');
-        $nama = request('nama');
-        $ext = request('ext');
-        $email = request('email');
-        $idjawatan = request('idjawatan');
-        $idgred = request('idgred');
-        $idbahagian = request('idbahagian');
-        $idunit = request('idunit');
+    // Prepare the data for update
+    $updateData = $request->only([
+        'nama',
+        'ext',
+        'email',
+        'idjawatan',
+        'idgred',
+        'idbahagian',
+        'idunit'
+    ]);
 
-        Pegawai::where('id', $id)->update(array(
-            'nama'    => $nama,
-            'ext' =>  $ext,
-            'email'  => $email,
-            'idjawatan'  => $idjawatan,
-            'idgred'  => $idgred,
-            'idbahagian'  => $idbahagian,
-            'idunit'  => $idunit,
-        ));
+    // Handle image upload if new image is provided
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
 
-        return redirect('/pegawai/')->with('success','Maklumat berjaya dikemaskini.');
+        // Delete old image if it exists
+        if ($pegawai->image && Storage::exists('public/' . $pegawai->image)) {
+            Storage::delete('public/' . $pegawai->image);
+        }
+
+        // Get file extension
+        $extension = $image->getClientOriginalExtension();
+
+        // Create filename from user's name
+        $filename = Str::slug($request->input('nama')) . '.' . $extension;
+
+        // Check if file with same name exists
+        if (Storage::exists('public/images/profile/' . $filename)) {
+            $counter = 1;
+            while (Storage::exists('public/images/profile/' . $filename)) {
+                $filename = Str::slug($request->input('nama')) . '_' . $counter . '.' . $extension;
+                $counter++;
+            }
+        }
+
+        // Store the new image
+        $path = $image->storeAs('public/images/profile', $filename);
+
+        // Add the image path to the update data
+        $updateData['image'] = 'images/profile/' . $filename;
     }
+
+    // Update the database using mass assignment
+    $pegawai->fill($updateData)->save();
+
+    return redirect('/pegawai/')->with('success', 'Maklumat berjaya dikemaskini.');
+}
 
     public function search() {
     $bahagian = request('bahagian');

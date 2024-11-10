@@ -6,18 +6,32 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pegawai extends Model
 {
-    //
-    Protected $table = 'pegawai';
+    protected $table = 'pegawai';
 
-    public function bahagian()
-    {
-    	return $this->belongsTo('App\Bahagian');
-    }
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'nama',
+        'ext',
+        'email',
+        'idjawatan',
+        'idgred',
+        'idbahagian',
+        'idunit',
+        'image'
+    ];
 
-    public function unit()
-    {
-    	return $this->belongsTo('App\Unit');
-    }
-
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }
 
