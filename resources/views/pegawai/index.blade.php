@@ -99,8 +99,6 @@
 
                     </td>
                     <td style="text-align: center; padding-top: 35px;">
-                        <a class="btn btn-warning" href="{{route('pegawai.edit', $pegawai->id)}}"><i class="fa-solid fa-pencil"></i> Kemaskini</a>
-                        {{--
                         @can('edit-users')
                         <a class="btn btn-warning" style="width: 65px; margin-right: 5px;" href="{{route('pegawai.edit', $pegawai->id)}}"><i class="fa-solid fa-pencil"></i> Edit</a>
                         @endcan
@@ -111,7 +109,6 @@
                             <button onclick="return confirm('Delete {{$pegawai->nama}}')" type="submit" class="btn btn-danger" style="width: 65px;"><i class="fa-solid fa-trash"></i> Delete</button>
                         </form>
                         @endcan
-                        --}}
                     </td>
                 </tr>
             @endforeach
