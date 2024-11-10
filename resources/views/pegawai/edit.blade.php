@@ -119,7 +119,6 @@
             } else {
                 $('select[name="idunit"]').empty();
             }
-
         });
     });
 </script>

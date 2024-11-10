@@ -76,8 +76,14 @@
                     <tr>
                         <td>{{ $pegawais->firstItem() + $key }}.</td>
                         <td style="text-align: center;">
-                            <img src="https://placehold.co/100x100/png" width="100" height="100"
-                                style="display: block; margin: 0 auto;" />
+                            @if ($pegawai->image)
+                                <img src="{{ asset('storage/' . $pegawai->image) }}" width="100" height="100"
+                                    style="display: block; margin: 0 auto; object-fit: cover;"
+                                    alt="{{ $pegawai->nama }}" />
+                            @else
+                                <img src="https://placehold.co/100x100/png" width="100" height="100"
+                                    style="display: block; margin: 0 auto;" alt="Placeholder" />
+                            @endif
                         </td>
                         <td>
                             <div class="d-flex flex-column" style="padding-top: 5px;">

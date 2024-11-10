@@ -8,7 +8,7 @@
     <div class="container-fluid">
 
         <form class="bg-light rounded p-4 shadow-lg" action="{{ url('/pegawai/') }}" method="POST"
-            style="max-width: 500px; margin: auto;">
+            style="max-width: 500px; margin: auto;" enctype="multipart/form-data">
             @csrf
 
             <h1 style="text-align:center;">Tambah Direktori Pegawai</h1>
@@ -72,8 +72,8 @@
                 <label for="formFile" class="form-label">Gambar Profile</label>
                 <div class="input-group">
                     <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="formFile"
-                            aria-describedby="inputGroupFileAddon01">
+                        <input type="file" class="custom-file-input" id="formFile" name="image"
+                            aria-describedby="inputGroupFileAddon01" accept="image/*">
                         <label class="custom-file-label" for="formFile">Pilih fail</label>
                     </div>
                 </div>
@@ -93,27 +93,31 @@
         jQuery('select[name="idbahagian"]').on('change', function() {
             var bahagianID = jQuery(this).val();
 
-            //alert(bahagianID);
-
             if (bahagianID) {
                 jQuery.ajax({
-                    url: 'http://apps8.kdh.moh.gov.my/edirektori/public/pegawai/getUnit/' +
-                        bahagianID,
-                    //url : {{ url('/pegawai/getUnit/') }}+bahagianID,
+                    url: `/pegawai/getUnit/${bahagianID}`,
                     type: "GET",
                     dataType: "json",
                     success: function(data) {
                         jQuery('select[name="idunit"]').empty();
+                        // Add default option
+                        jQuery('select[name="idunit"]').append(
+                            '<option value="%">-Sila Pilih-</option>');
+                        // Add units from response
                         jQuery.each(data, function(key, value) {
-                            $('select[name="idunit"]').append('<option value="' +
-                                key + '">' + value + '</option>')
+                            jQuery('select[name="idunit"]').append(
+                                '<option value="' +
+                                key + '">' + value + '</option>');
                         });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching units:', error);
                     }
                 });
             } else {
-                $('select[name="idunit"]').empty();
+                jQuery('select[name="idunit"]').empty();
+                jQuery('select[name="idunit"]').append('<option value="%">-Sila Pilih-</option>');
             }
-
         });
     });
 </script>

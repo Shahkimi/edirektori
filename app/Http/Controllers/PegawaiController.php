@@ -8,13 +8,13 @@ use App\Unit;
 use DB;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class PegawaiController extends Controller
 {
-
     public function index() {
-
 
         $id = Auth::id();
 
@@ -113,22 +113,51 @@ class PegawaiController extends Controller
 
     }
 
-    public function store() {
+    public function store(Request $request) {
 
         $pegawai = new Pegawai();
 
-        $pegawai->nama = request('nama');
-        $pegawai->ext = request('ext');
-        $pegawai->email = request('email');
-        $pegawai->idjawatan = request('idjawatan');
-        $pegawai->idgred = request('idgred');
-        $pegawai->idbahagian = request('idbahagian');
-        $pegawai->idunit = request('idunit');
+        $pegawai->nama = $request->input('nama');
+        $pegawai->ext = $request->input('ext');
+        $pegawai->email = $request->input('email');
+        $pegawai->idjawatan = $request->input('idjawatan');
+        $pegawai->idgred = $request->input('idgred');
+        $pegawai->idbahagian = $request->input('idbahagian');
+        $pegawai->idunit = $request->input('idunit');
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            // Get file extension
+            $extension = $image->getClientOriginalExtension();
+
+            // Create filename from user's name
+            // Replace spaces with underscores and convert to lowercase
+            $filename = Str::slug($request->input('nama')) . '.' . $extension;
+
+            // Check if file with same name exists
+            if (Storage::exists('public/images/profile/' . $filename)) {
+                // If exists, append a number to make it unique
+                $counter = 1;
+                while (Storage::exists('public/images/profile/' . $filename)) {
+                    $filename = Str::slug($request->input('nama')) . '_' . $counter . '.' . $extension;
+                    $counter++;
+                }
+            }
+
+            // Store the image in the public/images/profile directory
+            $path = $image->storeAs('public/images/profile', $filename);
+
+            // Save the image path to the database
+            $pegawai->image = 'images/profile/' . $filename;
+        }
 
         $pegawai->save();
 
-        return redirect('/pegawai')->with('mssg','Rekod telah dikemaskini');
+        return redirect('/pegawai')->with('mssg', 'Rekod telah dikemaskini');
     }
+
 
     public function destroy($id) {
         $pegawai = Pegawai::FindOrFail($id);
@@ -249,15 +278,11 @@ class PegawaiController extends Controller
     ->with('fbahagian', $bahagian)
     ->with('funit', $unit);
 }
-
-
-
     public function getUnit($id)
     {
         $unit = Unit::where('idbahagian',$id)->pluck("unit","id");
         return json_encode($unit);
     }
-
 
     public function get_by_bahagian(Request $request)
     {
@@ -273,7 +298,6 @@ class PegawaiController extends Controller
                 $html .= '<option value="'.$unit->id.'">'.$unit->unit.'</option>';
             }
         }
-
         return response()->json(['html' => $html]);
     }
 
@@ -308,8 +332,5 @@ class PegawaiController extends Controller
             ['bahagians' => $bahagians,
             'units' => $units,
         ]);
-
     }
-
-
 }

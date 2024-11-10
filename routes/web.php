@@ -24,7 +24,7 @@ Route::delete('/pegawai/{id}', 'PegawaiController@destroy')->name('pegawai.destr
 Route::get('/pegawai/edit/{id}', 'PegawaiController@edit')->name('pegawai.edit')->middleware('auth');
 Route::post('/pegawai/edit', 'PegawaiController@update')->middleware('auth');
 
-Route::get('/pegawai/getUnit/{id}','PegawaiController@getUnit')->name('getUnit');
+Route::get('/pegawai/getUnit/{id}', 'PegawaiController@getUnit')->name('pegawai.getUnit');
 
 Route::get('/kawalan/jawatan', 'KawalanController@index_jawatan')->name('kawalan.index_jawatan')->middleware('auth');
 Route::get('/kawalan/jawatan/create', 'KawalanController@create_jawatan')->name('kawalan.create_jawatan');
@@ -81,6 +81,6 @@ Route::post('/admin/users/edit', 'admin\UsersController@update')->name('admin.us
 
 Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware('can:manage-users')->group(function(){
 	Route::resource('/users','UsersController',['except' =>['show']]);
-});	
+});
 
 
