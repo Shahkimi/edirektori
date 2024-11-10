@@ -15,6 +15,7 @@ class PegawaiController extends Controller
 
     public function index() {
 
+
         $id = Auth::id();
 
         $roles = DB::table('role_user')
@@ -187,72 +188,68 @@ class PegawaiController extends Controller
     }
 
     public function search() {
+    $bahagian = request('bahagian');
+    $unit = request('unit');
+    $id = Auth::id();
+    $role = 1;
 
-        $bahagian = request('bahagian');
-        $unit = request('unit');
+    // Get roles from database
+    $roles = DB::table('role_user')
+        ->select('role_user.*', 'bahagian_user.bahagian_id')
+        ->leftjoin('bahagian_user', 'bahagian_user.user_id', '=', 'role_user.user_id')
+        ->where('role_user.user_id', $id)
+        ->get();
 
-        $id = Auth::id();
-
-        $role = 1;
-
-        $roles = DB::table('role_user')
-            ->select('role_user.*', 'bahagian_user.bahagian_id')
-            ->leftjoin('bahagian_user', 'bahagian_user.user_id', '=', 'role_user.user_id')
-            ->where('role_user.user_id',$id)
-            ->get();
-
-        foreach ($roles as $a) {
-           $role = $a->role_id;
-           $id = $a->user_id;
-           $bahagian1 = $a->bahagian_id;
-        }
-
-        if($role == 1){  //admin
-            $filter_bahagian = $bahagian;
-        } else {
-            $filter_bahagian = $bahagian1;
-        }
-
-
-        $jawatans = DB::table('tjawatan')->orderBy('jawatan', 'asc')->get();
-        $bahagians = DB::table('tbahagian')->orderBy('bahagian', 'asc')->where('id', 'like', $filter_bahagian)->get();
-        $units = DB::table('tunit')->orderBy('unit', 'asc')->where('idbahagian', 'like', $filter_bahagian)->get();
-
-
-
-       if ($nama==NULL)  $nama="";
-
-        $pegawais = DB::table('pegawai')
-            ->select('pegawai.*', 'tbahagian.bahagian','tunit.unit','tjawatan.jawatan','tgred.gred', 'tgred.gred2')
-            ->leftJoin('tbahagian', 'tbahagian.id', '=', 'pegawai.idbahagian')
-            ->leftJoin('tunit', 'tunit.id', '=', 'pegawai.idunit')
-            ->leftJoin('tjawatan', 'tjawatan.id', '=', 'pegawai.idjawatan')
-            ->leftJoin('tgred', 'tgred.id', '=', 'pegawai.idgred')
-            ->where('nama','like', '%'.$nama.'%')
-            ->where('pegawai.idunit','like', $unit)
-            ->where('pegawai.idbahagian', 'like', $filter_bahagian)
-            ->orderBy('bahagian', 'asc')
-            ->orderBy('unit', 'asc')
-            ->orderBy('gred2', 'desc')
-            ->orderBy('nama', 'asc')
-            ->paginate(10);
-
-        //echo json_encode($pegawais);
-       // echo $jawatan;
-
-
-        return view('pegawai.index',
-            ['pegawais' => $pegawais,
-             'jawatans' => $jawatans,
-             'bahagians' => $bahagians,
-             'units' => $units,
-        ])
-        ->with('fnama', $nama)
-        ->with('fbahagian', $bahagian)
-        ->with('funit', $unit)
-        ;
-
+    // Assign role and bahagian based on user data
+    foreach ($roles as $a) {
+        $role = $a->role_id;
+        $id = $a->user_id;
+        $bahagian1 = $a->bahagian_id;
     }
+
+    // Filter based on admin or user
+    if($role == 1) {  // admin
+        $filter_bahagian = $bahagian;
+    } else {
+        $filter_bahagian = $bahagian1;
+    }
+
+    // Initialize or set default value for $nama
+    $nama = request('nama', ''); // Default to an empty string if not provided
+
+    // Fetch data for jawatans, bahagians, and units
+    $jawatans = DB::table('tjawatan')->orderBy('jawatan', 'asc')->get();
+    $bahagians = DB::table('tbahagian')->orderBy('bahagian', 'asc')->where('id', 'like', $filter_bahagian)->get();
+    $units = DB::table('tunit')->orderBy('unit', 'asc')->where('idbahagian', 'like', $filter_bahagian)->get();
+
+    // Fetch pegawai data based on filters
+    $pegawais = DB::table('pegawai')
+        ->select('pegawai.*', 'tbahagian.bahagian', 'tunit.unit', 'tjawatan.jawatan', 'tgred.gred', 'tgred.gred2')
+        ->leftJoin('tbahagian', 'tbahagian.id', '=', 'pegawai.idbahagian')
+        ->leftJoin('tunit', 'tunit.id', '=', 'pegawai.idunit')
+        ->leftJoin('tjawatan', 'tjawatan.id', '=', 'pegawai.idjawatan')
+        ->leftJoin('tgred', 'tgred.id', '=', 'pegawai.idgred')
+        ->where('nama', 'like', '%' . $nama . '%')
+        ->where('pegawai.idunit', 'like', $unit)
+        ->where('pegawai.idbahagian', 'like', $filter_bahagian)
+        ->orderBy('bahagian', 'asc')
+        ->orderBy('unit', 'asc')
+        ->orderBy('gred2', 'desc')
+        ->orderBy('nama', 'asc')
+        ->paginate(10);
+
+    // Return view with data
+    return view('pegawai.index', [
+        'pegawais' => $pegawais,
+        'jawatans' => $jawatans,
+        'bahagians' => $bahagians,
+        'units' => $units,
+    ])
+    ->with('fnama', $nama)
+    ->with('fbahagian', $bahagian)
+    ->with('funit', $unit);
+}
+
 
 
     public function getUnit($id)

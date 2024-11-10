@@ -80,8 +80,8 @@
             </div>
 
             <div style="text-align: center;">
-                <a class="btn btn-outline-primary mb-2" href="javascript:history.back()">Batal</a>
-                <input type="submit" value="Simpan" class="btn btn-primary mb-2">
+                <a class="btn btn-outline-danger btn-sm mb-2" href="javascript:history.back()">Batal</a>
+                <input type="submit" value="Simpan" class="btn btn-primary btn-sm mb-2">
             </div>
 
         </form>

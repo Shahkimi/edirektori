@@ -36,9 +36,9 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasAnyRoles(['admin','penyelaras']);
         });
 
-        Gate::define('delete-users', function($user){
-            return $user->hasRoles('admin');
-        });
+        // Gate::define('delete-users', function($user){
+        //     return $user->hasRoles('admin');
+        // });
 
          Gate::define('for-admin', function($user){
             return $user->hasRoles('admin');
