@@ -1,116 +1,125 @@
 @extends('layouts.app')
 
 @section('content')
+    <br />
 
-<br/>
+    <div class="container-fluid">
 
-<div class="container-fluid">
+        <form class="bg-light rounded p-4 shadow-lg" action="{{ url('/pegawai/edit') }}" method="POST"
+            style="max-width: 500px; margin: auto;">
+            @csrf
 
-	<form class="bg-light rounded p-4 shadow-lg" action="{{url('/pegawai/edit')}}" method="POST" style="max-width: 500px; margin: auto;">
-		@csrf
+            <h1 style="text-align:center;">Kemaskini Direktori Pegawai</h1>
+            <br />
 
-		<h1 style="text-align:center;">Kemaskini Direktori Pegawai</h1>
-		<br/>
+            <input type="text" name="id" id="id" class="form-control" value="{{ $pegawai->id }}" hidden>
 
-		<input type="text" name="id" id="id" class="form-control" value="{{$pegawai->id}}" hidden>
+            <div>
+                <label for="nama"> Nama : </label><br />
+                <input type = "text" id = "nama" name="nama" class="form-control" value="{{ $pegawai->nama }}">
+                <br />
+            </div>
 
-		<label for="nama"> Nama : </label><br/>
-		<input type = "text" id = "nama" name="nama" class="form-control" value="{{$pegawai->nama}}">
-		<br/>
+            <div>
+                <label for="ext"> Ext : </label><br />
+                <input type = "text" id = "ext" name="ext" class="form-control" value="{{ $pegawai->ext }}">
+                <br />
+            </div>
 
-		<label for="ext"> Ext : </label><br/>
-		<input type = "text" id = "ext" name="ext" class="form-control" value="{{$pegawai->ext}}">
-		<br/>
+            <div>
+                <label for="email"> Emel : </label><br />
+                <input type = "text" id = "email" name="email" class="form-control" value="{{ $pegawai->email }}"
+                    placeholder="Contoh: user@moh.gov.my">
+                <br />
+            </div>
 
-		<label for="email"> Emel : </label><br/>
-		<input type = "text" id = "email" name="email" class="form-control" value="{{$pegawai->email}}">
-		<br/>
+            <div>
+                <label for="idjawatan"> Jawatan: </label><br />
+                <select class="form-control btn-sm " name="idjawatan" id = "idjawatan">
 
+                    <option value="%">-Semua-</option>
 
-		<label for="idjawatan"> Jawatan: </label><br/>
-        <select class="form-control btn-sm " name="idjawatan" id = "idjawatan">
+                    @foreach ($jawatans as $jawatan)
+                        <option value="{{ $jawatan->id }}" {{ $jawatan->id == $pegawai->idjawatan ? 'selected' : '' }}>
+                            {{ $jawatan->jawatan }}</option>
+                    @endforeach
 
-            <option value="%">-Semua-</option>
+                </select></th><br />
+            </div>
 
-            @foreach($jawatans as $jawatan)
-                <option value="{{ $jawatan->id }}" {{ ($jawatan->id == $pegawai->idjawatan)? "selected" : "" }} >{{ $jawatan->jawatan }}</option>
-            @endforeach
+            <div>
+                <label for="idgred"> Gred: </label><br />
+                <select class="form-control btn-sm " name="idgred" id = "idgred">
 
-        </select></th><br/>
+                    <option value="%">-Semua-</option>
 
+                    @foreach ($greds as $gred)
+                        <option value="{{ $gred->id }}" {{ $gred->id == $pegawai->idgred ? 'selected' : '' }}>
+                            {{ $gred->gred }}</option>
+                    @endforeach
 
-		<label for="idgred"> Gred: </label><br/>
-        <select class="form-control btn-sm " name="idgred" id = "idgred">
+                </select></th><br />
+            </div>
 
-            <option value="%">-Semua-</option>
+            <label for="idbahagian"> Bahagian: </label><br />
+            <select class="form-control btn-sm " name="idbahagian" id = "idbahagian">
 
-            @foreach($greds as $gred)
-                <option value="{{ $gred->id }}" {{ ($gred->id == $pegawai->idgred)? "selected" : "" }} >{{ $gred->gred }}</option>
-            @endforeach
+                <option value="%">-Semua-</option>
 
-        </select></th><br/>
+                @foreach ($bahagians as $bahagian)
+                    <option value="{{ $bahagian->id }}" {{ $bahagian->id == $pegawai->idbahagian ? 'selected' : '' }}>
+                        {{ $bahagian->bahagian }}</option>
+                @endforeach
 
-		<label for="idbahagian"> Bahagian: </label><br/>
-        <select class="form-control btn-sm " name="idbahagian" id = "idbahagian">
+            </select></th><br />
 
-            <option value="%">-Semua-</option>
+            <label for="idunit"> Unit: </label><br />
+            <select class="form-control btn-sm " name="idunit" id = "idunit">
 
-            @foreach($bahagians as $bahagian)
-                <option value="{{ $bahagian->id }}" {{ ($bahagian->id == $pegawai->idbahagian)? "selected" : "" }} >{{ $bahagian->bahagian }}</option>
-            @endforeach
+                <option value="%">-Semua-</option>
 
-        </select></th><br/>
+                @foreach ($units as $unit)
+                    <option value="{{ $unit->id }}" {{ $unit->id == $pegawai->idunit ? 'selected' : '' }}>
+                        {{ $unit->unit }}</option>
+                @endforeach
 
-		<label for="idunit"> Unit: </label><br/>
-        <select class="form-control btn-sm " name="idunit" id = "idunit">
+            </select></th><br /><br />
 
-            <option value="%">-Semua-</option>
+            <div style="text-align: center;">
+                <a class="btn btn-outline-danger mb-2" href="javascript:history.back()">Batal</a>
+                <input type="submit" value="Simpan" class="btn btn-primary mb-2">
+            </div>
 
-            @foreach($units as $unit)
-                <option value="{{ $unit->id }}" {{ ($unit->id == $pegawai->idunit)? "selected" : "" }} >{{ $unit->unit }}</option>
-            @endforeach
-
-        </select></th><br/><br/>
-
-		<div style="text-align: center;">
-			<a class="btn btn-outline-primary mb-2" href="javascript:history.back()">Batal</a>
-			<input type="submit" value="Simpan" class="btn btn-primary mb-2">
-		</div>
-
-	</form >
-</div>
+        </form>
+    </div>
 @endsection
 
- <script type="text/javascript">
-    jQuery(document).ready(function()
-    {
-            jQuery('select[name="idbahagian"]').on('change',function() {
-                var bahagianID = jQuery(this).val();
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        jQuery('select[name="idbahagian"]').on('change', function() {
+            var bahagianID = jQuery(this).val();
 
-	    		//alert(bahagianID);
+            //alert(bahagianID);
 
+            if (bahagianID) {
+                jQuery.ajax({
+                    url: 'http://apps8.kdh.moh.gov.my/edirektori/public/pegawai/getUnit/' +
+                        bahagianID,
+                    //url : {{ url('/pegawai/getUnit/') }}+bahagianID,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        jQuery('select[name="idunit"]').empty();
+                        jQuery.each(data, function(key, value) {
+                            $('select[name="idunit"]').append('<option value="' +
+                                key + '">' + value + '</option>')
+                        });
+                    }
+                });
+            } else {
+                $('select[name="idunit"]').empty();
+            }
 
-                if (bahagianID) {
-                    jQuery.ajax({
-                        url : 'http://apps8.kdh.moh.gov.my/edirektori/public/pegawai/getUnit/'+bahagianID,
-                        //url : {{url('/pegawai/getUnit/')}}+bahagianID,
-                        type : "GET",
-                        dataType : "json",
-                        success:function(data)
-                        {
-                            jQuery('select[name="idunit"]').empty();
-                            jQuery.each(data, function(key,value) {
-                                $('select[name="idunit"]').append('<option value="'+ key +'">'+ value +'</option>')
-                            });
-                        }
-                    });
-                }
-                else
-                {
-                    $('select[name="idunit"]').empty();
-                }
-
-            });
+        });
     });
-
-    </script>
+</script>

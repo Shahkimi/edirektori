@@ -12,15 +12,8 @@ use Illuminate\Support\Facades\Auth;
 
 class PegawaiController extends Controller
 {
-    // public function __construct() {
-    //     $this->middleware('auth');
-    // }
 
     public function index() {
-
-    	//$pegawai = Pegawai::orderBy('name','desc')->get();
-    	// $pegawai = Pegawai::where('type','hawaiian')->get();
-    	// $pegawai = Pegawai::latest()->get();
 
         $id = Auth::id();
 
@@ -43,8 +36,6 @@ class PegawaiController extends Controller
         } else {
             $filter_bahagian = $bahagian1;
         }
-
-       // echo "role=".$role;
 
         $pegawais = Pegawai::all();
 
@@ -106,11 +97,6 @@ class PegawaiController extends Controller
 
     public function create() {
 
-       // $bahagians = Bahagian::all()->pluck('bahagian', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-    	//return view('pegawai.create', compact('bahagians'));
-
-
         $jawatans = DB::table('tjawatan')->orderBy('jawatan', 'asc')->get();
         $greds = DB::table('tgred')->orderBy('gred', 'asc')->get();
         $bahagians = DB::table('tbahagian')->orderBy('bahagian', 'desc')->get();
@@ -123,7 +109,6 @@ class PegawaiController extends Controller
                         'bahagians' => $bahagians,
                         'units' => $units,
                     ]);
-
 
     }
 
@@ -158,8 +143,6 @@ class PegawaiController extends Controller
         $fnama = request('nama');
         $fidbahagian = request('idbahagian');
         $fidunit = request('idunit');
-
-//echo "funit".$fidunit;
 
         $jawatans = DB::table('tjawatan')->orderBy('jawatan', 'asc')->get();
         $greds = DB::table('tgred')->orderBy('gred', 'asc')->get();
@@ -205,11 +188,6 @@ class PegawaiController extends Controller
 
     public function search() {
 
-        // $pegawais = Pegawai::all();
-        //$pegawai = Pegawai::orderBy('name','desc')->get();
-        // $pegawai = Pegawai::where('type','hawaiian')->get();
-        // $pegawai = Pegawai::latest()->get();
-        $nama = request('nama');
         $bahagian = request('bahagian');
         $unit = request('unit');
 
