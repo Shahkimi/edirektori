@@ -89,10 +89,25 @@
                 <label for="formFile" class="form-label">Gambar Profile</label>
                 @if ($pegawai->image)
                     <div class="mb-2 text-center">
-                        <img src="{{ Storage::url($pegawai->image) }}" alt="Current Profile Picture" class="img-thumbnail"
+
+                        @php
+                            $imagePath = $pegawai->image;
+                            // Remove 'public/' if it's in the path
+                            $imagePath = str_replace('public/', '', $imagePath);
+                        @endphp
+
+                        <img src="{{ asset('storage/'.$imagePath) }}"
+                            alt="Current Profile Picture"
+                            class="img-thumbnail"
                             style="max-width: 150px; display: inline-block;">
+
+                    </div>
+                @else
+                    <div class="mb-2 text-center">
+                        <p>No image uploaded</p>
                     </div>
                 @endif
+
                 <div class="input-group">
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="formFile" name="image"
