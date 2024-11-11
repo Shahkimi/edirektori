@@ -1,3 +1,3 @@
 <?php
-header('Location: http://apps8.kdh.moh.gov.my/edirektori/public/');
+header('Location: http://localhost/edirektori/public/');
 ?>

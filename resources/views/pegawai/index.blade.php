@@ -75,22 +75,40 @@
                 @foreach ($pegawais as $key => $pegawai)
                     <tr>
                         <td>{{ $pegawais->firstItem() + $key }}.</td>
-                        <td style="text-align: center;">
+                        <td style="text-align: center; width: 125px; height: 125px; vertical-align: middle;">
                             @if ($pegawai->image)
-                                <img src="{{ asset('storage/' . $pegawai->image) }}" width="100" height="100"
-                                    style="display: block; margin: 0 auto; object-fit: cover;"
-                                    alt="{{ $pegawai->nama }}" />
+                                <img
+                                    src="{{ asset('storage/' . $pegawai->image) }}"
+                                    style="
+                                        max-width: 125px;
+                                        max-height: 125px;
+                                        width: auto;
+                                        height: auto;
+                                        object-fit: contain;
+                                        display: block;
+                                        margin: auto;
+                                    "
+                                    alt="{{ $pegawai->nama }}"
+                                />
                             @else
-                                <img src="https://placehold.co/100x100/png" width="100" height="100"
-                                    style="display: block; margin: 0 auto;" alt="Placeholder" />
+                                <img
+                                    src="https://st4.depositphotos.com/9998432/22597/v/450/depositphotos_225976914-stock-illustration-person-gray-photo-placeholder-man.jpg"
+                                    style="
+                                        width: 125px;
+                                        height: 125px;
+                                        object-fit: contain;
+                                        display: block;
+                                        margin: auto;
+                                    "
+                                    alt="Image Placeholder"
+                                />
                             @endif
                         </td>
                         <td>
                             <div class="d-flex flex-column" style="padding-top: 5px;">
-                                <div class="font-weight-bold mb-1">{{ $pegawai->nama }}</div>
-                                <div class="text-muted">
-                                    <i class="fa-solid fa-user-tie"></i> {{ $pegawai->jawatan }} - Gred :
-                                    {{ $pegawai->gred }}<br>
+                                <div class="font-weight-bold mb-1" style="padding-top: 10px;">{{ $pegawai->nama }}</div>
+                                <div class="text-muted" style="padding-top: 8x;">
+                                    <i class="fa-solid fa-user-tie"></i> {{ $pegawai->jawatan }} {{ $pegawai->gred }}<br>
                                     <i class="fa-solid fa-phone"></i> 04-7741000 Ext : {{ $pegawai->ext }} <br />
                                     @if ($pegawai->email != null && $pegawai->email != '-')
                                         <i class="fa-solid fa-envelope"></i> {{ $pegawai->email }}
