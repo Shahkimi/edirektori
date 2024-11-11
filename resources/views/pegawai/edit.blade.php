@@ -6,7 +6,7 @@
     <div class="container-fluid">
 
         <form class="bg-light rounded p-4 shadow-lg" action="{{ url('/pegawai/edit') }}" method="POST"
-            style="max-width: 500px; margin: auto;">
+            style="max-width: 500px; margin: auto;" enctype="multipart/form-data">
             @csrf
 
             <h1 style="text-align:center;">Kemaskini Direktori Pegawai</h1>
@@ -85,6 +85,26 @@
 
             </select></th><br /><br />
 
+            <div class="mb-3">
+                <label for="formFile" class="form-label">Gambar Profile</label>
+                @if ($pegawai->image)
+                    <div class="mb-2 text-center">
+                        <img src="{{ Storage::url($pegawai->image) }}" alt="Current Profile Picture" class="img-thumbnail"
+                            style="max-width: 150px; display: inline-block;">
+                    </div>
+                @endif
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="formFile" name="image"
+                            aria-describedby="inputGroupFileAddon01" accept="image/*">
+                        <label class="custom-file-label" for="formFile" id="fileLabel">
+                            {{ $pegawai->image ? basename($pegawai->image) : 'Choose Image' }}
+                        </label>
+                    </div>
+                </div>
+                <small class="form-text text-muted">Leave empty to keep current image</small>
+            </div>
+
             <div style="text-align: center;">
                 <a class="btn btn-outline-danger mb-2" href="javascript:history.back()">Batal</a>
                 <input type="submit" value="Simpan" class="btn btn-primary mb-2">
@@ -119,7 +139,33 @@
             } else {
                 $('select[name="idunit"]').empty();
             }
+        });
+    });
 
+    // Javascript for show file name
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('formFile');
+        const fileLabel = document.getElementById('fileLabel');
+
+        function truncateFilename(filename, maxLength = 25) {
+            if (filename.length <= maxLength) return filename;
+            const extension = filename.split('.').pop();
+            const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
+            const truncatedName = nameWithoutExt.substring(0, maxLength - extension.length - 3) + '...';
+            return `${truncatedName}.${extension}`;
+        }
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const filename = this.files[0].name;
+                fileLabel.textContent = truncateFilename(filename);
+                fileLabel.title = filename; // Show full filename on hover
+            } else {
+                const currentImage =
+                    '{{ $pegawai->image ? basename($pegawai->image) : 'Choose Image' }}';
+                fileLabel.textContent = truncateFilename(currentImage);
+                fileLabel.title = currentImage;
+            }
         });
     });
 </script>

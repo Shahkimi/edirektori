@@ -8,11 +8,12 @@ use App\Unit;
 use DB;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class PegawaiController extends Controller
 {
-
     public function index() {
 
         $id = Auth::id();
@@ -112,22 +113,51 @@ class PegawaiController extends Controller
 
     }
 
-    public function store() {
+    public function store(Request $request) {
 
         $pegawai = new Pegawai();
 
-        $pegawai->nama = request('nama');
-        $pegawai->ext = request('ext');
-        $pegawai->email = request('email');
-        $pegawai->idjawatan = request('idjawatan');
-        $pegawai->idgred = request('idgred');
-        $pegawai->idbahagian = request('idbahagian');
-        $pegawai->idunit = request('idunit');
+        $pegawai->nama = $request->input('nama');
+        $pegawai->ext = $request->input('ext');
+        $pegawai->email = $request->input('email');
+        $pegawai->idjawatan = $request->input('idjawatan');
+        $pegawai->idgred = $request->input('idgred');
+        $pegawai->idbahagian = $request->input('idbahagian');
+        $pegawai->idunit = $request->input('idunit');
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            // Get file extension
+            $extension = $image->getClientOriginalExtension();
+
+            // Create filename from user's name
+            // Replace spaces with underscores and convert to lowercase
+            $filename = Str::slug($request->input('nama')) . '.' . $extension;
+
+            // Check if file with same name exists
+            if (Storage::exists('public/images/profile/' . $filename)) {
+                // If exists, append a number to make it unique
+                $counter = 1;
+                while (Storage::exists('public/images/profile/' . $filename)) {
+                    $filename = Str::slug($request->input('nama')) . '_' . $counter . '.' . $extension;
+                    $counter++;
+                }
+            }
+
+            // Store the image in the public/images/profile directory
+            $path = $image->storeAs('public/images/profile', $filename);
+
+            // Save the image path to the database
+            $pegawai->image = 'images/profile/' . $filename;
+        }
 
         $pegawai->save();
 
-        return redirect('/pegawai')->with('mssg','Rekod telah dikemaskini');
+        return redirect('/pegawai')->with('mssg', 'Rekod telah dikemaskini');
     }
+
 
     public function destroy($id) {
         $pegawai = Pegawai::FindOrFail($id);
@@ -160,107 +190,126 @@ class PegawaiController extends Controller
 
     }
 
-     public function update()
-    {
-        $pegawai = new pegawai();
+    public function update(Request $request)
+{
+    $id = $request->input('id');
+    $pegawai = Pegawai::findOrFail($id);
 
-        $id = request('id');
-        $nama = request('nama');
-        $ext = request('ext');
-        $email = request('email');
-        $idjawatan = request('idjawatan');
-        $idgred = request('idgred');
-        $idbahagian = request('idbahagian');
-        $idunit = request('idunit');
+    // Prepare the data for update
+    $updateData = $request->only([
+        'nama',
+        'ext',
+        'email',
+        'idjawatan',
+        'idgred',
+        'idbahagian',
+        'idunit'
+    ]);
 
-        Pegawai::where('id', $id)->update(array(
-            'nama'    => $nama,
-            'ext' =>  $ext,
-            'email'  => $email,
-            'idjawatan'  => $idjawatan,
-            'idgred'  => $idgred,
-            'idbahagian'  => $idbahagian,
-            'idunit'  => $idunit,
-        ));
+    // Handle image upload if new image is provided
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
 
-        return redirect('/pegawai/')->with('success','Maklumat berjaya dikemaskini.');
+        // Delete old image if it exists
+        if ($pegawai->image && Storage::exists('public/' . $pegawai->image)) {
+            Storage::delete('public/' . $pegawai->image);
+        }
+
+        // Get file extension
+        $extension = $image->getClientOriginalExtension();
+
+        // Create filename from user's name
+        $filename = Str::slug($request->input('nama')) . '.' . $extension;
+
+        // Check if file with same name exists
+        if (Storage::exists('public/images/profile/' . $filename)) {
+            $counter = 1;
+            while (Storage::exists('public/images/profile/' . $filename)) {
+                $filename = Str::slug($request->input('nama')) . '_' . $counter . '.' . $extension;
+                $counter++;
+            }
+        }
+
+        // Store the new image
+        $path = $image->storeAs('public/images/profile', $filename);
+
+        // Add the image path to the update data
+        $updateData['image'] = 'images/profile/' . $filename;
     }
+
+    // Update the database using mass assignment
+    $pegawai->fill($updateData)->save();
+
+    return redirect('/pegawai/')->with('success', 'Maklumat berjaya dikemaskini.');
+}
 
     public function search() {
+    $bahagian = request('bahagian');
+    $unit = request('unit');
+    $id = Auth::id();
+    $role = 1;
 
-        $bahagian = request('bahagian');
-        $unit = request('unit');
+    // Get roles from database
+    $roles = DB::table('role_user')
+        ->select('role_user.*', 'bahagian_user.bahagian_id')
+        ->leftjoin('bahagian_user', 'bahagian_user.user_id', '=', 'role_user.user_id')
+        ->where('role_user.user_id', $id)
+        ->get();
 
-        $id = Auth::id();
-
-        $role = 1;
-
-        $roles = DB::table('role_user')
-            ->select('role_user.*', 'bahagian_user.bahagian_id')
-            ->leftjoin('bahagian_user', 'bahagian_user.user_id', '=', 'role_user.user_id')
-            ->where('role_user.user_id',$id)
-            ->get();
-
-        foreach ($roles as $a) {
-           $role = $a->role_id;
-           $id = $a->user_id;
-           $bahagian1 = $a->bahagian_id;
-        }
-
-        if($role == 1){  //admin
-            $filter_bahagian = $bahagian;
-        } else {
-            $filter_bahagian = $bahagian1;
-        }
-
-
-        $jawatans = DB::table('tjawatan')->orderBy('jawatan', 'asc')->get();
-        $bahagians = DB::table('tbahagian')->orderBy('bahagian', 'asc')->where('id', 'like', $filter_bahagian)->get();
-        $units = DB::table('tunit')->orderBy('unit', 'asc')->where('idbahagian', 'like', $filter_bahagian)->get();
-
-
-
-       if ($nama==NULL)  $nama="";
-
-        $pegawais = DB::table('pegawai')
-            ->select('pegawai.*', 'tbahagian.bahagian','tunit.unit','tjawatan.jawatan','tgred.gred', 'tgred.gred2')
-            ->leftJoin('tbahagian', 'tbahagian.id', '=', 'pegawai.idbahagian')
-            ->leftJoin('tunit', 'tunit.id', '=', 'pegawai.idunit')
-            ->leftJoin('tjawatan', 'tjawatan.id', '=', 'pegawai.idjawatan')
-            ->leftJoin('tgred', 'tgred.id', '=', 'pegawai.idgred')
-            ->where('nama','like', '%'.$nama.'%')
-            ->where('pegawai.idunit','like', $unit)
-            ->where('pegawai.idbahagian', 'like', $filter_bahagian)
-            ->orderBy('bahagian', 'asc')
-            ->orderBy('unit', 'asc')
-            ->orderBy('gred2', 'desc')
-            ->orderBy('nama', 'asc')
-            ->paginate(10);
-
-        //echo json_encode($pegawais);
-       // echo $jawatan;
-
-
-        return view('pegawai.index',
-            ['pegawais' => $pegawais,
-             'jawatans' => $jawatans,
-             'bahagians' => $bahagians,
-             'units' => $units,
-        ])
-        ->with('fnama', $nama)
-        ->with('fbahagian', $bahagian)
-        ->with('funit', $unit)
-        ;
-
+    // Assign role and bahagian based on user data
+    foreach ($roles as $a) {
+        $role = $a->role_id;
+        $id = $a->user_id;
+        $bahagian1 = $a->bahagian_id;
     }
 
+    // Filter based on admin or user
+    if($role == 1) {  // admin
+        $filter_bahagian = $bahagian;
+    } else {
+        $filter_bahagian = $bahagian1;
+    }
 
+    // Initialize or set default value for $nama
+    $nama = request('nama', ''); // Default to an empty string if not provided
+
+    // Fetch data for jawatans, bahagians, and units
+    $jawatans = DB::table('tjawatan')->orderBy('jawatan', 'asc')->get();
+    $bahagians = DB::table('tbahagian')->orderBy('bahagian', 'asc')->where('id', 'like', $filter_bahagian)->get();
+    $units = DB::table('tunit')->orderBy('unit', 'asc')->where('idbahagian', 'like', $filter_bahagian)->get();
+
+    // Fetch pegawai data based on filters
+    $pegawais = DB::table('pegawai')
+        ->select('pegawai.*', 'tbahagian.bahagian', 'tunit.unit', 'tjawatan.jawatan', 'tgred.gred', 'tgred.gred2')
+        ->leftJoin('tbahagian', 'tbahagian.id', '=', 'pegawai.idbahagian')
+        ->leftJoin('tunit', 'tunit.id', '=', 'pegawai.idunit')
+        ->leftJoin('tjawatan', 'tjawatan.id', '=', 'pegawai.idjawatan')
+        ->leftJoin('tgred', 'tgred.id', '=', 'pegawai.idgred')
+        ->where('nama', 'like', '%' . $nama . '%')
+        ->where('pegawai.idunit', 'like', $unit)
+        ->where('pegawai.idbahagian', 'like', $filter_bahagian)
+        ->orderBy('bahagian', 'asc')
+        ->orderBy('unit', 'asc')
+        ->orderBy('gred2', 'desc')
+        ->orderBy('nama', 'asc')
+        ->paginate(10);
+
+    // Return view with data
+    return view('pegawai.index', [
+        'pegawais' => $pegawais,
+        'jawatans' => $jawatans,
+        'bahagians' => $bahagians,
+        'units' => $units,
+    ])
+    ->with('fnama', $nama)
+    ->with('fbahagian', $bahagian)
+    ->with('funit', $unit);
+}
     public function getUnit($id)
     {
         $unit = Unit::where('idbahagian',$id)->pluck("unit","id");
         return json_encode($unit);
     }
-
 
     public function get_by_bahagian(Request $request)
     {
@@ -276,7 +325,6 @@ class PegawaiController extends Controller
                 $html .= '<option value="'.$unit->id.'">'.$unit->unit.'</option>';
             }
         }
-
         return response()->json(['html' => $html]);
     }
 
@@ -311,8 +359,5 @@ class PegawaiController extends Controller
             ['bahagians' => $bahagians,
             'units' => $units,
         ]);
-
     }
-
-
 }

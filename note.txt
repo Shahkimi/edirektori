@@ -1,0 +1,4 @@
+add this syntax
+ALTER TABLE pegawai ADD COLUMN image VARCHAR(255) NULL AFTER idunit;
+
+add permission to "everyone" to folder profile

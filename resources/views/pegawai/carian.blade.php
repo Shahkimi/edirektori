@@ -6,7 +6,7 @@
 @section('content')
 
 <div class="row justify-content-center">
-    <div class="col-auto">  
+    <div class="col-auto">
 
         <form action="{{url('/pegawai/search')}}" method="Get" id="search">
             @csrf
@@ -44,7 +44,7 @@
 
                 </select>
             </div>
-            
+
             <div style="text-align: center;">
                 <input class="btn btn-primary" type="submit" name="" value="Carian" form="search">
             </div>
@@ -63,7 +63,7 @@
     {
             jQuery('select[name="bahagian"]').on('change',function() {
                 var bahagianID = jQuery(this).val();
-                
+
                 if (bahagianID) {
                     jQuery.ajax({
                          url : 'http://apps8.kdh.moh.gov.my/edirektori/public/pegawai/getUnit/'+bahagianID,
@@ -80,14 +80,13 @@
                         }
                     });
                 }
-                else 
+                else
                 {
                     $('select[name="unit"]').empty();
                 }
-                
+
             });
     });
 
     </script>
-           
- 
+

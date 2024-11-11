@@ -113,14 +113,14 @@ class UsersController extends Controller
 
         $id = $user->id;
         $bahagian = $request->bahagian;
-      
+
         //echo json_encode($id);
 
-        if ($bahagian==NULL) $bahagian = "";     
+        if ($bahagian==NULL) $bahagian = "";
 
         Bahagian_user::where('user_id', $id)->update(array(
             'bahagian_id' => $bahagian
-        )); 
+        ));
 
         return redirect()->route('admin.users.index');
     }
@@ -131,16 +131,16 @@ class UsersController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
-    {
-        if(Gate::denies('delete-users')){
-            return redirect(route('admin.users.index'));
-        }
-        $user->roles()->detach();
-        $user->delete();
+    // public function destroy(User $user)
+    // {
+    //     if(Gate::denies('delete-users')){
+    //         return redirect(route('admin.users.index'));
+    //     }
+    //     $user->roles()->detach();
+    //     $user->delete();
 
-        return redirect()->route('admin.users.index');
-    }
+    //     return redirect()->route('admin.users.index');
+    // }
 
     public function create()
     {
@@ -168,7 +168,7 @@ class UsersController extends Controller
             'email' => request('email'),
             'password' => Hash::make(request('password')),
         ]);
-        
+
         $bahagian = Bahagian::select('id')->where('id',request('bahagian'))->first();
         $user->roles()->attach($roles);
         $user->bahagian()->attach($bahagian);
@@ -178,7 +178,7 @@ class UsersController extends Controller
 
 public function search()
     {
-        
+
         $name = request('name');
         $email = request('email');
         $idbahagian = request('bahagian');
